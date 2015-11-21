@@ -1,11 +1,15 @@
+#require File.expand_path(File.join(File.dirname(__FILE__), ".", "web_steps"))
+
 # Add a declarative step here for populating the DB with movies.
 
 Given /the following movies exist/ do |movies_table|
   movies_table.hashes.each do |movie|
-    # each returned element will be a hash whose key is the table header.
-    # you should arrange to add that movie to the database here.
+    m = Movie.new
+    m.title = movie[:title]
+    m.rating = movie[:rating]
+    m.release_date = movie[:release_date]
+    m.save
   end
-  fail "Unimplemented"
 end
 
 # Make sure that one string (regexp) occurs before or after another one
@@ -22,10 +26,26 @@ end
 #  "When I check the following ratings: G"
 
 When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
-  # HINT: use String#split to split up the rating_list, then
-  #   iterate over the ratings and reuse the "When I check..." or
-  #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
-  fail "Unimplemented"
+  list = rating_list.split(',')
+  list.each do |rating|
+    if uncheck
+      step "I uncheck \"ratings[#{rating.strip}]\""
+    else
+      step "I check \"ratings[#{rating.strip}]\""
+    end
+  end
+end
+
+When(/^I 'submit' the search form on the homepage$/) do
+  step 'I press "Refresh"'
+end
+
+Then /^I should see (.*) movies with rating (.*)/ do |count, rating|
+  page.assert_selector(:xpath, "./html/body/div/table/tbody/tr[td='#{rating}']/td[1]", :count => count)
+end
+
+Then /^I should not see movies with rating (.*)/ do |rating|
+  page.assert_selector(:xpath, "./html/body/div/table/tbody/tr[td='#{rating}']/td[1]", :count => 0)
 end
 
 Then /I should see all the movies/ do
