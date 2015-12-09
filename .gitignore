@@ -1,0 +1,5 @@
+rottenpotatoes/tmp
+rottenpotatoes/db/test.sqlite3
+rottenpotatoes/db/*
+rottenpotatoes/db
+rottenpotatoes/log
